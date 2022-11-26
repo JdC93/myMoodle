@@ -1,0 +1,27 @@
+<%- include("partials/header"); -%>
+
+<table class="AssignmentTable">
+  <thead>
+  <tr>
+    <td class="Headers" >Assignments</td>
+    <td class="Headers" >Marks</td>
+    <td class="Headers" >Letter Grade</td>
+    <td class="Headers" >Average</td>
+    <td class="Headers" >Median</td>   
+  </tr>
+</thead>
+<% grades.forEach(function(grade, index) { %>
+  <tr>
+
+  <td class="Assignments"><%= grade.assessment.name -%></td>
+  <td class="Grade"> <%= grade.mark -%> / <%= grade.assessment.totalMarks -%></td>
+  <td class="LetterGrade"><%= lettergrades[index] -%></td>
+  <td class="Average"><%= classAverage[index] -%></td>
+  <td class="Median">9%</td>
+</tr>
+<%}) %>
+</table>
+
+
+
+<%- include("partials/footer"); -%>

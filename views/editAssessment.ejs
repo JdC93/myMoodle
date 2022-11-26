@@ -1,0 +1,43 @@
+<%- include("partials/header"); -%>
+
+<script type="text/javaScript" src="/getallgrades.js"></script>
+
+<h1><%=grades[0].assessment.name%></h1>
+<br><br>
+
+
+<form id="gradestable" action="/editAssessment/<%=grades[0].assessment._id%>" onsubmit="getallgrades()" method="post">
+
+    <label>Assessment Name:</label><br>
+    <input type="text" name="assname" value="<%=grades[0].assessment.name%>"><br><br>
+
+    <label>Weight:</label><br>
+    <input type="text" name="weight" value="<%=grades[0].assessment.weight%>"><br><br>
+    
+    <label>Total Marks:</label><br>
+    <input type="text" name="totalMarks" value="<%=grades[0].assessment.totalMarks%>"><br><br>
+
+    <table>
+        <tr>
+            <th>Student Name</th>
+            <th>Grade</th>
+        </tr>
+    
+        <% grades.forEach((grade) => { %>
+        <tr>
+            <td><%= grade.student.name %></td>
+            <td class="grades"><input type="text" name="grades" value="<%=grade.mark%>"><br></td>
+        </tr>
+        <%}) %>
+    </table>
+
+
+    <input type="hidden" id="allGrades" name="allGrades" value=""><br>
+
+    <input type="submit" value="Submit" >
+
+</form>
+
+
+
+<%- include("partials/footer"); -%>

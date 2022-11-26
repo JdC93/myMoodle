@@ -1,0 +1,27 @@
+
+<%- include("partials/header"); -%>
+
+
+<h1><%=grades[0].assessment.name%></h1>
+<p>Weight: <%=grades[0].assessment.weight%></p>
+<p>Total Marks: <%=grades[0].assessment.totalMarks%></p>
+
+<a href="/editAssessment/<%= grades[0].assessment._id %>">edit</a>
+
+<table>
+    <tr>
+        <th>Student Name</th>
+        <th>Grade</th>
+    </tr>
+
+    <% grades.forEach((grade) => { %>
+    <tr>
+        <td><%= grade.student.name %></td>
+        <td><%= grade.mark %></td>
+    </tr>
+    <%}) %>
+</table>
+
+<h3>class average: </h3>
+<p><%= average %></p>
+<%- include("partials/footer"); -%>
