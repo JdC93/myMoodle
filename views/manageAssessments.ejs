@@ -1,0 +1,68 @@
+<%- include("partials/header"); -%>
+
+<h1 class="CenteredText">All Assessments</h1>
+<table class="AssignmentTable">
+  <thead>
+    <tr>
+      <td class="Headers">Assessment</td>
+      <td class="Headers">Total Marks</td>
+      <td class="Headers">Weight</td>
+      <td class="Headers">Average</td>
+      <td class="Headers"></td>
+      <td class="Headers"></td>
+    </tr>
+  </thead>
+  <% assessments.forEach(function(assessment, index) { %>
+  <tr>
+    <td class="CenteredText"><%= assessment.name -%></td>
+    <td class="CenteredText"><%= assessment.totalMarks %></td>
+    <td class="CenteredText"><%= assessment.weight %></td>
+    <td class="CenteredText"><%= averages[index] %></td>
+    <td class="CenteredText">
+      <a href="/assessment/<%= assessment._id %>">view</a>
+    </td>
+    <td class="CenteredText">
+      <a href="/editAssessment/<%= assessment._id %>">edit</a>
+    </td>
+  </tr>
+  <%}) %>
+</table>
+<div class="container">
+  <p>
+    <a href="submitAssessment" class="button">Create an assessment</a>
+  </p>
+</div>
+
+<br /><br />
+
+<div>
+  <h3 style="text-align: center">Class Distribution</h3>
+</div>
+<div id="chart"></div>
+
+<script
+  type="text/javascript"
+  src="https://www.gstatic.com/charts/loader.js"
+></script>
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['bar']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = [<%- assessments.map((assessment, index) => "[" + ['"'+assessment.name+'"', averages[index]] + "]")-%>];
+    var data = google.visualization.arrayToDataTable([['Assessments', 'Class Average'],...data]);
+    var options = {
+      bars: 'vertical',
+      axes: {
+            y: {
+              0: { label: 'Score'}
+            }
+          },
+    };
+
+    var chart = new google.charts.Bar(document.getElementById('chart'));
+
+    chart.draw(data, google.charts.Bar.convertOptions(options));
+  }
+</script>
+<%- include("partials/footer"); -%>

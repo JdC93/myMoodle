@@ -1,0 +1,38 @@
+<%- include("partials/header"); -%>
+
+<h1>
+  <style>
+    h1 {
+      text-align: center;
+    }
+  </style>
+  <%=grades[0].assessment.name%>
+</h1>
+<h5 class="Headers">Weight: <%=grades[0].assessment.weight%></h5>
+<h5 class="Headers">Total Marks: <%=grades[0].assessment.totalMarks%></h5>
+<div class="container">
+  <p>
+    <a href="/editAssessment/<%= grades[0].assessment._id %>" class="button"
+      >Edit Assessment</a
+    >
+  </p>
+</div>
+
+<table class="AssignmentTable">
+  <tr>
+    <th class="Headers">Student Name</th>
+    <th class="Headers">Grade</th>
+  </tr>
+
+  <% grades.forEach((grade) => { %>
+  <tr>
+    <td class="CenteredText"><%= grade.student.name %></td>
+    <td class="CenteredText"><%= grade.mark %></td>
+  </tr>
+  <%}) %>
+</table>
+
+<h2>Class Average</h2>
+<h5 class="Headers"><%= average %></h5>
+
+<%- include("partials/footer"); -%>

@@ -1,0 +1,81 @@
+<%- include("partials/header"); -%>
+
+<script type="text/javaScript" src="/getallgrades.js"></script>
+
+<h1>
+  <style>
+    h1 {
+      text-align: center;
+    }
+  </style>
+  <%=grades[0].assessment.name%>
+</h1>
+<br /><br />
+
+<form
+  id="gradestable"
+  action="/editAssessment/<%=grades[0].assessment._id%>"
+  onsubmit="getallgrades()"
+  method="post"
+>
+  <div class="submitAssessment">
+    <label class="labelName" value="above">Assessment Name:</label><br />
+    <input
+      class="inputBox"
+      type="text"
+      name="assname"
+      value="<%=grades[0].assessment.name%>"
+    /><br /><br />
+
+    <label class="labelName">Weight:</label><br />
+    <input
+      class="inputBox"
+      type="text"
+      name="weight"
+      value="<%=grades[0].assessment.weight%>"
+    /><br /><br />
+
+    <label class="labelName">Total Marks:</label><br />
+    <input
+      class="inputBox"
+      type="text"
+      name="totalMarks"
+      value="<%=grades[0].assessment.totalMarks%>"
+    /><br /><br />
+  </div>
+  <table class="editAssign">
+    <tr>
+      <th class="Headers">Student Name</th>
+      <th class="Headers">Grade</th>
+    </tr>
+
+    <% grades.forEach((grade) => { %>
+    <tr>
+      <td class="Headers"><%= grade.student.name %></td>
+      <td>
+        <div>
+          <input
+            class="gradeBox"
+            type="text"
+            name="grades"
+            value="<%=grade.mark%>"
+          /><br />
+        </div>
+      </td>
+    </tr>
+    <%}) %>
+  </table>
+
+  <input
+    class="inputBox"
+    type="hidden"
+    id="allGrades"
+    name="allGrades"
+    value=""
+  /><br />
+  <div class="submitAssessment">
+    <input class="submitAssessment" type="submit" value="Submit" />
+  </div>
+</form>
+
+<%- include("partials/footer"); -%>

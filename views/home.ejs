@@ -1,0 +1,44 @@
+<%- include('partials/header'); -%>
+
+<div class="column left">
+    <h1>Welcome To SOEN287</h1>
+    <p style=" white-space: pre-line;"><%=startingContent%></p>
+
+    <% posts.forEach(function(post) { %>
+      <h1><%= post.title %></h1>
+        <p><%= post.content %></p>
+    <%}) %>
+
+</div>
+
+<div class="column right">
+
+        <div class="announcements">
+            <h2 style="order: 1">Announcements</h2>
+            <% if (user.role == "Teacher") { %>
+            <div>
+                <h3>Compose a new announcement</h3>
+                <div>
+                <form action="/announce" method="post">
+                      <input type="text" name="subject" value="Subject">
+                      <br>
+                      <textarea  name="content" >Announcement</textarea> <br>
+                    <button type="submit" name="button">Publish</button>
+                  </form>
+                </div>
+            </div>
+            <% } %>
+
+            <% for (let announcement of announcements) { %>
+                <div>
+                    <h3><%= announcement.title %></h3>
+                    <p><%= announcement.content %></p>
+                </div>
+            <% } %>
+
+        </div>
+
+</div>
+
+
+<%- include('partials/footer'); -%>

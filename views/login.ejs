@@ -1,0 +1,53 @@
+<!DOCTYPE html>   
+<html>   
+<head> <link rel='stylesheet' href='/css/design.css'></head>
+<meta name= "viewport" content="width=device-width, initial-scale=1">  
+<title> Login Portal </title> 
+
+  </head>    
+   <body onload="myFunction()">  
+    <input type="hidden" id="msg" value="<%=message%>">
+
+   <center> <h1> SOEN 287 Login Portal </h1> </center>   
+
+   <form name="form1" action="/login" method="POST">  
+          <div class= "container0">   
+            <label> Username: </label>   
+            <input type= "username" placeholder= "Enter your Email Address" required oninput="lower()" id= "username" name= "username" 
+            title="Enter a valid email address" required>  
+            <label> Password: </label>   
+            <input type= "password" id= "password" placeholder= "Enter Password" name= "password" id="password" required>  
+            <button type= "submit"> Login </button>   
+            <p>Don't have an account? <a href="/register">Sign up!</a></p>
+          </div>   
+   </form>
+
+<script>
+   const emailElmtRegex = new RegExp('[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-zA-Z]{2,4}');
+   document.getElementById("entered").innerHTML = "";
+   document.getElementById("send").innerHTML = ""
+   
+   function lower() {
+       let emailElmt = document.getElementById("email");
+       document.getElementById("entered").innerHTML = "Entered: " + emailElmt.value;
+       emailElmt.value = emailElmt.value.toLowerCase();
+   
+       if (emailElmtRegex.test(emailElmt.value)) {
+           document.getElementById("send").innerHTML = "Send: " + emailElmt.value;
+       } else {
+           document.getElementById("send").innerHTML = ""
+       }
+         }
+      </script>
+
+<script>
+  function myFunction() {
+    let msg = document.getElementById("msg").value;
+    if (msg > " "){
+      alert (msg);
+    }
+  }
+  </script>
+
+  </body>
+  </html>
