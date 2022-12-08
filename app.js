@@ -188,6 +188,27 @@ app.get("/edituser/:userid", async (req, res) => {
 
 });
 
+// =========== Edit Professor ===========
+app.post("/editUser/:id", async (req, res) => {
+
+  try{
+
+    let user = await User.findById(req.params.id);
+    await user.updateOne({
+      name: req.body.name,
+      username: req.body.username,
+      address: req.body.address,
+      phone: req.body.phone
+    });
+
+  } catch (err) {
+    return console.log(err);
+  }
+
+  res.redirect("/user/"+req.params.id);
+
+});
+
 // =========== Help Route ===========
 app.get("/help", (req, res) => {
   if (req.isAuthenticated()) {
