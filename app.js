@@ -8,13 +8,12 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
-const { forEach } = require('lodash');
-
+const { forEach, find } = require('lodash');
 
 const homeStartingContent = "Dear Students, Welcome to this edition of SOEN287 - Web Programming.\n My name is Abdelghani and I will be facilitating this course this Fall 2022. \n This is an introduction course on Web programming. The course will include discussions and explanations of the following topics: \nInternet architecture and protocols; Web applications through clients and servers; markup languages; client-side programming using scripting languages; static website contents and dynamic page generation through server-side programming; preserving state in Web applications. \nRegards, \nAbdelghani Benharref.";
-const professorContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
 const app = express();
+
 const PORT = process.env.PORT || 3030;
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -24,14 +23,14 @@ app.use(session({
   secret: "This is a key for the cookie",
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: 'mongodb+srv://admin-parsa:Parsa1234@cluster0.v6lcnxb.mongodb.net/soen287proj' })
+store: MongoStore.create({ mongoUrl: 'mongodb+srv'+process.env.DBuser+':'+process.env.DBpass+'@cluster0.v6lcnxb.mongodb.net/soen287proj' })
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-mongoose.connect("mongodb+srv://admin-parsa:Parsa1234@cluster0.v6lcnxb.mongodb.net/soen287proj", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://"+process.env.DBuser+":"+process.env.DBpass+"@cluster0.v6lcnxb.mongodb.net/soen287proj", {useNewUrlParser: true});
 
 
 
@@ -45,6 +44,8 @@ const userSchema = new mongoose.Schema ({
   password: String,
   name: String,
   role: String,
+  address: String,
+  phone: String
 });
 userSchema.plugin(passportLocalMongoose);
 const User = new mongoose.model("User", userSchema);
@@ -81,6 +82,7 @@ const Student = mongoose.model("Student", studentSchema);
 // =============== Professor Schema ===============
 const profSchema = new mongoose.Schema ({
   fullname: String,
+  title: String,
   description: String,
   username: String
 })
@@ -91,14 +93,19 @@ const gradeSchema = {
   mark: Number,
   student: {
     type: mongoose.Schema.Types.ObjectId, ref: 'Student'
-},
+  },
   assessment: {
     type: mongoose.Schema.Types.ObjectId, ref: 'Assessment'
   }
 }
 const Grade = mongoose.model("Grade", gradeSchema);
 
-
+// =============== Announcement Schema ===============
+const announcementSchema = new mongoose.Schema ({
+  title: String,
+  content: String
+})
+const Announcement = mongoose.model("Announcement", announcementSchema);
 
 
 
@@ -107,17 +114,77 @@ const Grade = mongoose.model("Grade", gradeSchema);
 app.get("/", async (req, res) => {
 
 let posts = await Post.find({});
+let announcements = await Announcement.find({});
 
 if (req.isAuthenticated()) {
 
   res.render("home", {
     startingContent: homeStartingContent,
     posts: posts,
+    announcements: announcements,
     user: req.user
     });
 } else {
 res.redirect("/login");
 }
+
+});
+
+// =========== User Route ===========
+app.get("/user/:userid", async (req, res) => {
+  const requestedUserId = req.params.userid;
+
+  if (req.isAuthenticated() && req.user.role == "Student") {
+    let student = await Student.findOne({username: requestedUserId});
+    res.render("user", {
+      student: student,
+      user: req.user
+    });
+
+  } else if (req.isAuthenticated() && req.user.role == "Teacher"){
+    let prof = await Professor.findOne({username: requestedUserId});
+    res.render("user", {
+      prof: prof,
+      user: req.user
+    });
+
+  } else if (req.isAuthenticated()){
+    res.render("user", {
+      user: req.user
+    });
+
+  } else {
+    res.redirect("/login");
+    }
+
+});
+
+// =========== User Edit Page ===========
+app.get("/edituser/:userid", async (req, res) => {
+  const requestedUserId = req.params.userid;
+
+  if (req.isAuthenticated() && req.user.role == "Student") {
+    let student = await Student.findOne({username: requestedUserId});
+    res.render("editUser", {
+      student: student,
+      user: req.user
+    });
+
+  } else if (req.isAuthenticated() && req.user.role == "Teacher"){
+    let prof = await Professor.findOne({username: requestedUserId});
+    res.render("editUser", {
+      prof: prof,
+      user: req.user
+    });
+
+  } else if (req.isAuthenticated()){
+    res.render("editUser", {
+      user: req.user
+    });
+
+  } else {
+    res.redirect("/login");
+    }
 
 });
 
@@ -164,7 +231,7 @@ app.post("/editProfessor/:profid", async (req, res) => {
 
     let prof = await Professor.findById(req.params.profid);
     await prof.updateOne({
-      fullname: req.body.fullname,
+      title: req.body.tile,
       description: req.body.description
     });
 
@@ -224,8 +291,49 @@ app.get("/managePosts", async (req, res) => {
 });
 
 
+/*************************************
+ Edit, delete and submit an Announcement
+ *************************************/
+
+app.post("/announce", async function(req, res){
+
+  const post = await Announcement.create({
+    title: req.body.subject,
+    content: req.body.content
+  });
+
+  try {
+    await post.save();
+  } catch(error){
+    res.status(500).send(error);
+  }
+  res.redirect("/");
+});
+
+app.post("/editAnnouncement/:id", async (req, res) => {
+  const requestedPostId = req.params.id;
+  const doc = await Announcement.findOne({ _id: requestedPostId });
+  const update = { content: req.body.content, title: req.body.subject };
+  await doc.updateOne(update);
+
+  res.redirect("/");
+});
+
+app.post("/deleteAnnouncement/:id", (req, res) => {
+  const requestedId = req.params.id;
+  Announcement.findByIdAndRemove({_id:requestedId} , function(err){
+    if(err){
+      console.log(err);
+    }else{
+      res.redirect("/");
+    }
+  })
+});
+
+
+
 /*********************************
- edit, delete and submit a post
+ Edit, delete and submit a post
  *********************************/
 
 app.post("/editPost/:postid", async (req, res) => {
@@ -274,6 +382,13 @@ app.get("/myAssessments", async (req, res) => {
   let lettergrades = [];
   let classAverage = [];
   let classGrades
+  let medians = [];
+  let stddev = [];
+  let overall = {
+    marks: 0,
+    total: 0,
+    letterGrade: ''
+  };
 
 
   // If the logged in user is a student
@@ -290,18 +405,32 @@ app.get("/myAssessments", async (req, res) => {
   // for each assessment of this student
   for(let grade of grades){
     // compute and populate the lettergrades array
-    lettergrades.push(toLetterGrade(grade.mark));
+    lettergrades.push(toLetterGrade(grade.mark, grade.assessment.totalMarks));
 
     // find the class average
     classGrades = await Grade.find({assessment: grade.assessment});
     classAverage.push(getAverage(classGrades));
+
+    //find the median
+    medians.push(getMedian(classGrades.map(grade => grade.mark)));
+
+    //find the standard deviation
+    stddev.push(getStandardDeviation(classGrades.map(grade => grade.mark)));
+
+    //add to overall grade
+    overall.marks += grade.mark/grade.assessment.totalMarks * grade.assessment.weight;
+    overall.total += grade.assessment.weight;
   }
+  overall.letterGrade = toLetterGrade(overall.marks, overall.total);
 
   res.render("myAssessments", {
     grades: grades,
     user: req.user,
     lettergrades: lettergrades,
-    classAverage: classAverage
+    classAverage: classAverage,
+    medians: medians,
+    stddev: stddev,
+    overall: overall
   });
 
 });
@@ -312,16 +441,28 @@ app.get("/myAssessments", async (req, res) => {
 Teacher assessment page
 ***********************/
 
-app.get("/manageAssessments", (req, res) => {
+app.get("/manageAssessments", async (req, res) => {
 
   if (req.isAuthenticated() && req.user.role === "Teacher"){
 
-    Assessment.find({}, (err, assessments) => {
+
+
+    let assessments = await Assessment.find({});
+    let averages = [];
+
+    for (let assessment of assessments) {
+      let grades = await Grade.find({assessment: assessment});
+      averages.push(getAverage(grades))
+    }
+
+
+
       res.render("manageAssessments", {
         assessments: assessments,
+        averages: averages,
         user: req.user
       });
-    });
+
 
 
   } else {
@@ -475,13 +616,12 @@ app.post("/editAssessment/:assid", async (req, res) => {
 ************************/
 
 app.get("/manageStudents", async (req, res) => {
-
+  // find all enrolled students
   let enrolledStudnets = await Student.find({});
-
+  // find all basic users (students who are not enrolled)
   let basicUsers = await User.find({role: "Basic"});
 
   if (req.isAuthenticated() && req.user.role === "Teacher") {
-
     res.render("manageStudents", {
       enrolledStudents: enrolledStudnets,
       basicUsers: basicUsers,
@@ -490,7 +630,6 @@ app.get("/manageStudents", async (req, res) => {
 } else {
   res.redirect("/login");
 }
-
 });
 
 
@@ -588,9 +727,9 @@ app.post("/removestudents", async (req, res) => {
 
 
 
-/*******************
- User Authentication
-********************/
+/***********************
+ User Authentication Pages
+************************/
 
 
 app.get("/register", (req, res) => {
@@ -599,7 +738,7 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   if (!req.isAuthenticated()){
-    res.render("login");
+    res.render("login", {message: " "});
   } else {
     res.redirect("/");
   }
@@ -615,19 +754,27 @@ app.get('/logout', function(req, res, next) {
 });
 
 
-/* --- User Registreation --- */
+/*******************
+ User Registration
+********************/
 
 app.post("/register", async (req, res) => {
 
   try{
+    // Throw an error if the secret code is not correct
+    if (req.body.isteacher == "Y" && req.body.secretcode != "soen287"){
+    throw "Teacher Secret Code is not correct!"
+    }
+
     // Create a new user using the username
     let newuser = await User.register({username: req.body.username}, req.body.password);
     await newuser.updateOne({name: req.body.name});
 
 
-    // TODO: authenticate teacher registration
-    if (Boolean(req.body.isteacher)){
-      // Add Teacher role to this user
+    // Authenticate teacher registration
+    // TODO: Hide the actual secret code
+    if (req.body.isteacher == "Y" && req.body.secretcode == process.env.SECRET){
+      //Set user role to Teacher
       await newuser.updateOne({role: "Teacher"});
 
       // Create a new professor document and save it
@@ -637,12 +784,14 @@ app.post("/register", async (req, res) => {
         description: " "
       });
       await newprof.save();
-    } else {
+
+    }  else {
+      //Set user role to Basic if it's not a teacher registeratoin
       await newuser.updateOne({role: "Basic"});
     }
 
     // Authenticate user (set a cookie) and render the homepage
-    passport.authenticate("local")(req, res, function(){
+    passport.authenticate("local")(req, res, () => {
       res.redirect("/");
     });
 
@@ -663,15 +812,23 @@ app.post("/login", function(req, res){
     password: req.body.password
   });
 
-  req.login(user, function(err){
-    if (err) {
-      console.log(err);
-    } else {
-      passport.authenticate("local")(req, res, function(){
-        res.redirect("/");
+  passport.authenticate("local",
+  (err, user, options) => {
+    if (user) {
+      // If the user exists log him in:
+      req.login(user, (error)=>{
+        if (error) {
+          res.send(error);
+        } else {
+          console.log("Successfully authenticated");
+          res.redirect("/");
+        };
       });
-    }
-  });
+    } else { // If the username and password don't match
+      console.log(options.message); // Prints the reason of the failure
+      res.render("login", { message: "Username or password incorrect" })
+    };
+})(req, res)
 
 });
 
@@ -694,11 +851,29 @@ function getAverage(grades){
   return avg;
 }
 
+function getMedian(grades){
+    grades.sort();
+    if(grades.length == 0) return 0;
+    //--EVEN number of elements
+    if(grades.length % 2 === 0){
+      return (grades[grades.length/2 - 1] + grades[grades.length/2])/2;
+    }
+    //--ODD number of elements
+    return grades[(grades.length+1)/2 - 1]
+}
+
+function getStandardDeviation (array) {
+  const n = array.length
+  const mean = array.reduce((a, b) => a + b) / n
+  return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
+}
+
 // TODO: The toLetterGrade function doesn't take into account the weight of the assessment.
 // You should take another parameter, weight, and scale your lettergrade conditions accordingly.
 
-function toLetterGrade(grade) {
+function toLetterGrade(grade, weight) {
   let LetterGrade = '';
+  grade = grade/weight * 100;
 
     if (grade >= 85) {
       LetterGrade = "A";
@@ -725,6 +900,6 @@ function toLetterGrade(grade) {
 
 
 
-app.listen(PORT, () => {
-  console.log(`server started on port ${PORT}`);
+app.listen(PORT, function() {
+  console.log("Server started on port"+PORT);
 });
