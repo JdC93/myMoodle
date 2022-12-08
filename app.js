@@ -23,14 +23,14 @@ app.use(session({
   secret: "This is a key for the cookie",
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: 'mongodb+srv://admin-parsa:Parsa1234@cluster0.v6lcnxb.mongodb.net/soen287proj' })
+  store: MongoStore.create({ mongoUrl: 'mongodb+srv'+process.env.DBuser+':'+process.env.DBpass+'@cluster0.v6lcnxb.mongodb.net/soen287proj' })
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-mongoose.connect("mongodb+srv://admin-parsa:Parsa1234@cluster0.v6lcnxb.mongodb.net/soen287proj", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://"+process.env.DBuser+":"+process.env.DBpass+"@cluster0.v6lcnxb.mongodb.net/soen287proj", {useNewUrlParser: true});
 
 
 
