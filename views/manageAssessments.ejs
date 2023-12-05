@@ -8,8 +8,8 @@
       <td class="Headers">Total Marks</td>
       <td class="Headers">Weight</td>
       <td class="Headers">Average</td>
-      <td class="Headers"></td>
-      <td class="Headers"></td>
+      <td class="Headers">View</td>
+      <td class="Headers">Edit</td>
     </tr>
   </thead>
   <% assessments.forEach(function(assessment, index) { %>
@@ -19,17 +19,17 @@
     <td class="CenteredText"><%= assessment.weight %></td>
     <td class="CenteredText"><%= averages[index] %></td>
     <td class="CenteredText">
-      <a href="/assessment/<%= assessment._id %>">view</a>
+      <a href="/assessment/<%= assessment._id %>"><img src="/view.png" style="width: 20px; height: 20px; object-fit: contain;"></a>
     </td>
     <td class="CenteredText">
-      <a href="/editAssessment/<%= assessment._id %>">edit</a>
+      <a href="/editAssessment/<%= assessment._id %>"><img src="/edit2.png" style="width: 20px; height: 20px; object-fit: contain;"></a>
     </td>
   </tr>
   <%}) %>
 </table>
 <div class="container">
   <p>
-    <a href="submitAssessment" class="button">Create an assessment</a>
+    <a href="submitAssessment" class="button" style="background-color: white;">Create a new assessment</a>
   </p>
 </div>
 

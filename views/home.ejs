@@ -1,42 +1,41 @@
 <%- include('partials/header'); -%>
 
-<div class="column left">
-    <h1>Welcome To SOEN287</h1>
-    <p style=" white-space: pre-line;"><%=startingContent%></p>
+<div class="mainColumn">
 
-    <% posts.forEach(function(post) { %>
-      <h1><%= post.title %></h1>
-        <p><%= post.content %></p>
-    <%}) %>
+    <div id="posts">
+        <h1>Welcome To ConCourse</h1><br><p>
+            Dear Students, Faculty, and Staff,
+        </p><br><p>
+            We are thrilled to welcome you to ConCourse, your gateway to a world of collaborative and engaging online learning. Whether you are a new student embarking on your academic journey or a seasoned educator enriching minds, we are here to support and inspire you.
+        </p><br><p>  
+            🎓 **Explore Your Courses:** Dive into our diverse range of courses designed to foster intellectual curiosity and personal growth. From the humanities to the sciences, our online offerings provide a flexible and accessible learning experience.
+        </p><br><p>    
+            📅 **Stay Informed:** Check out our course announcements and stay informed about upcoming events, deadlines, and important updates. Our dedicated team is committed to keeping you connected and engaged throughout your learning journey.
+        </p><br><p>    
+            👩‍💻 **Interactive Learning:** Experience the power of interactive learning resources, discussion forums, quizzes, and collaborative tools. Concordia's Moodle is more than just a platform; it's a dynamic community where ideas come to life.
+        </p><br><p>    
+            📚 **Library Resources:** Access an extensive array of digital resources through our online library. Whether you're conducting research or exploring additional reading materials, our library is here to support your academic endeavors.
+        </p><br><p>    
+            🔧 **Need Help?:** If you encounter any challenges or have questions, our support team is here for you. Visit our Help Center for assistance with technical issues or navigate to our FAQs for quick answers to common queries.
+        </p><br><p>    
+            Concordia's Moodle is more than an online platform; it's a hub for discovery, collaboration, and lifelong learning. We invite you to embark on a journey of knowledge, growth, and success.
+        </p><br><p>    
+            Best wishes for a productive and enriching academic experience!
+        </p>
+    </div>
 
-</div>
 
-<div class="column right">
+    <div id="posts">
+        <h2 style="text-align: center;">Copyright Notice</h2>
+        <p>This tool enables you to upload course information and content, subject to the Copyright Act and the University's Policy on Copyright Compliance and Copyright Guidelines for Instructors. 
+            In particular, this tool allows for the upload and distribution of course notes, course outlines, lab manuals and other such materials of which you are the author and rightful copyright owner. 
+            You may not upload any content, in whole or in part, whose copyright you do not own absent the prior written permission of the rightful copyright owner.
+        </p><br><p>    
+            Failure to comply with the Copyright Act is a violation of federal legislation. In addition to any action that may be taken by any rightful copyright owner, its licensing agent or the police authorities, 
+            the University reserves the right to take disciplinary or other action against a member with respect to any breaches of the University's Policy on Copyright Compliance.
+        </p>
+    </div>
 
-        <div class="announcements">
-            <h2 style="order: 1">Announcements</h2>
-            <% if (user.role == "Teacher") { %>
-            <div>
-                <h3>Compose a new announcement</h3>
-                <div>
-                <form action="/announce" method="post">
-                      <input type="text" name="subject" value="Subject">
-                      <br>
-                      <textarea  name="content" >Announcement</textarea> <br>
-                    <button type="submit" name="button">Publish</button>
-                  </form>
-                </div>
-            </div>
-            <% } %>
-
-            <% for (let announcement of announcements) { %>
-                <div>
-                    <h3><%= announcement.title %></h3>
-                    <p><%= announcement.content %></p>
-                </div>
-            <% } %>
-
-        </div>
 
 </div>
 

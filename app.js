@@ -23,22 +23,22 @@ app.use(session({
   secret: "This is a key for the cookie",
   resave: false,
   saveUninitialized: false,
-store: MongoStore.create({ mongoUrl: 'mongodb+srv://'+process.env.DBuser+':'+process.env.DBpass+'@cluster0.v6lcnxb.mongodb.net/soen287proj' })
+  store: MongoStore.create({ mongoUrl: 'mongodb+srv://admin-parsa:Parsa1234@cluster0.v6lcnxb.mongodb.net/soen287proj' })
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-mongoose.connect("mongodb+srv://"+process.env.DBuser+":"+process.env.DBpass+"@cluster0.v6lcnxb.mongodb.net/soen287proj", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://admin-parsa:Parsa1234@cluster0.v6lcnxb.mongodb.net/soen287proj", {useNewUrlParser: true});
 
 
 
 /**************************
-  --- Database Models ---
+  --- Database Models --- 
 **************************/
 
-// ================ User Schema ================
+// ================ User Schema ================ 
 const userSchema = new mongoose.Schema ({
   email: String,
   password: String,
@@ -56,14 +56,14 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
-// ================ Post Schema ================
+// ================ Post Schema ================ 
 const postSchema = new mongoose.Schema ({
   title: String,
   content: String
 });
 const Post = mongoose.model("Post", postSchema);
 
-// ============== Assessment Schema ==============
+// ============== Assessment Schema ============== 
 const assessmentSchema = new mongoose.Schema ({
   name: String,
   totalMarks: Number,
@@ -71,7 +71,7 @@ const assessmentSchema = new mongoose.Schema ({
 });
 const Assessment = mongoose.model("Assessment", assessmentSchema);
 
-// =============== Student Schema ===============
+// =============== Student Schema =============== 
 const studentSchema = new mongoose.Schema ({
   name: String,
   studentID: Number,
@@ -79,7 +79,7 @@ const studentSchema = new mongoose.Schema ({
 })
 const Student = mongoose.model("Student", studentSchema);
 
-// =============== Professor Schema ===============
+// =============== Professor Schema =============== 
 const profSchema = new mongoose.Schema ({
   fullname: String,
   title: String,
@@ -88,7 +88,7 @@ const profSchema = new mongoose.Schema ({
 })
 const Professor = mongoose.model("Professor", profSchema);
 
-// ================ Grade Schema ================
+// ================ Grade Schema ================ 
 const gradeSchema = {
   mark: Number,
   student: {
@@ -100,7 +100,7 @@ const gradeSchema = {
 }
 const Grade = mongoose.model("Grade", gradeSchema);
 
-// =============== Announcement Schema ===============
+// =============== Announcement Schema =============== 
 const announcementSchema = new mongoose.Schema ({
   title: String,
   content: String
@@ -112,28 +112,72 @@ const Announcement = mongoose.model("Announcement", announcementSchema);
 
 // =========== Home Route ===========
 app.get("/", async (req, res) => {
-
-let posts = await Post.find({});
-let announcements = await Announcement.find({});
-
 if (req.isAuthenticated()) {
-
   res.render("home", {
-    startingContent: homeStartingContent,
-    posts: posts,
-    announcements: announcements,
     user: req.user
     });
 } else {
 res.redirect("/login");
 }
+});
+
+
+// =========== Course1 Route ===========
+app.get("/soen287", async (req, res) => {
+
+  let posts = await Post.find({});
+  let announcements = await Announcement.find({});
+  
+  if (req.isAuthenticated()) {
+  
+    res.render("soen287", {
+      posts: posts,
+      announcements: announcements,
+      user: req.user
+      });
+  } else {
+  res.redirect("/login");
+  }
+});
+
+  // =========== Course2 Route ===========
+app.get("/soen357", async (req, res) => {
+
+  let posts = await Post.find({});
+  let announcements = await Announcement.find({});
+  
+  if (req.isAuthenticated()) {
+  
+    res.render("soen357", {
+      posts: posts,
+      announcements: announcements,
+      user: req.user
+      });
+  } else {
+  res.redirect("/login");
+  }
 
 });
+
+  // =========== Participants Route ===========
+  app.get("/participants", async (req, res) => {
+    let enrolledStudents = await Student.find({});
+    if (req.isAuthenticated()) {
+      res.render("participants", {
+        enrolledStudents: enrolledStudents,
+        user: req.user
+        });
+    } else {
+    res.redirect("/login");
+    }
+  });
+
+
 
 // =========== User Route ===========
 app.get("/user/:userid", async (req, res) => {
   const requestedUserId = req.params.userid;
-
+  
   if (req.isAuthenticated() && req.user.role == "Student") {
     let student = await Student.findOne({username: requestedUserId});
     res.render("user", {
@@ -152,7 +196,7 @@ app.get("/user/:userid", async (req, res) => {
     res.render("user", {
       user: req.user
     });
-
+    
   } else {
     res.redirect("/login");
     }
@@ -162,7 +206,7 @@ app.get("/user/:userid", async (req, res) => {
 // =========== User Edit Page ===========
 app.get("/edituser/:userid", async (req, res) => {
   const requestedUserId = req.params.userid;
-
+  
   if (req.isAuthenticated() && req.user.role == "Student") {
     let student = await Student.findOne({username: requestedUserId});
     res.render("editUser", {
@@ -181,31 +225,10 @@ app.get("/edituser/:userid", async (req, res) => {
     res.render("editUser", {
       user: req.user
     });
-
+    
   } else {
     res.redirect("/login");
     }
-
-});
-
-// =========== Edit Professor ===========
-app.post("/editUser/:id", async (req, res) => {
-
-  try{
-
-    let user = await User.findById(req.params.id);
-    await user.updateOne({
-      name: req.body.name,
-      username: req.body.username,
-      address: req.body.address,
-      phone: req.body.phone
-    });
-
-  } catch (err) {
-    return console.log(err);
-  }
-
-  res.redirect("/user/"+req.params.id);
 
 });
 
@@ -216,6 +239,31 @@ app.get("/help", (req, res) => {
   } else {
   res.redirect("/login");
   }
+});
+
+// =========== Deadlines Route ===========
+app.get("/deadlines", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.render("deadlines", {user: req.user});
+  } else {
+  res.redirect("/login");
+  }
+});
+
+
+// =========== Announcements Route ===========
+app.get("/announcements", async (req, res) => {
+  let announcements = await Announcement.find({});
+
+  if (req.isAuthenticated()) {
+    res.render("announcements", {
+      announcements: announcements,
+      user: req.user
+      });
+  } else {
+  res.redirect("/login");
+  }
+  
 });
 
 // =========== Professor Route ===========
@@ -247,7 +295,7 @@ app.get("/professor", async (req, res) => {
 
 // =========== Edit Professor ===========
 app.post("/editProfessor/:profid", async (req, res) => {
-
+  
   try{
 
     let prof = await Professor.findById(req.params.profid);
@@ -299,7 +347,7 @@ app.get("/managePosts", async (req, res) => {
 
 
   let posts = await Post.find({});
-
+  
   if (req.isAuthenticated() && req.user.role === "Teacher"){
 
     res.render("managePosts", {
@@ -313,16 +361,16 @@ app.get("/managePosts", async (req, res) => {
 
 
 /*************************************
- Edit, delete and submit an Announcement
+ Edit, delete and submit an Announcement 
  *************************************/
 
 app.post("/announce", async function(req, res){
-
+  
   const post = await Announcement.create({
     title: req.body.subject,
     content: req.body.content
   });
-
+  
   try {
     await post.save();
   } catch(error){
@@ -354,7 +402,7 @@ app.post("/deleteAnnouncement/:id", (req, res) => {
 
 
 /*********************************
- Edit, delete and submit a post
+ Edit, delete and submit a post 
  *********************************/
 
 app.post("/editPost/:postid", async (req, res) => {
@@ -378,12 +426,12 @@ app.post("/deletePost/:id", (req, res) => {
 });
 
 app.post("/newPost", async function(req, res){
-
+  
   const post = await Post.create({
     title: req.body.postTitle,
     content: req.body.postBody
   });
-
+  
   try {
     await post.save();
   } catch(error){
@@ -414,7 +462,7 @@ app.get("/myAssessments", async (req, res) => {
 
   // If the logged in user is a student
   if (req.isAuthenticated() && req.user.role == "Student"){
-  // find the student
+  // find the student 
   let student = await Student.findOne({username: req.user.username});
   // find the grades and populate the student and assessment refrences (to be able to access their data)
   grades = await Grade.find({student:student}).populate('student').populate('assessment');
@@ -465,17 +513,17 @@ Teacher assessment page
 app.get("/manageAssessments", async (req, res) => {
 
   if (req.isAuthenticated() && req.user.role === "Teacher"){
-
+    
 
 
     let assessments = await Assessment.find({});
     let averages = [];
-
+    
     for (let assessment of assessments) {
       let grades = await Grade.find({assessment: assessment});
       averages.push(getAverage(grades))
     }
-
+    
 
 
       res.render("manageAssessments", {
@@ -497,7 +545,7 @@ app.get("/manageAssessments", async (req, res) => {
 Assessment submission page
 *************************/
 
-app.get("/submitAssessment", (req, res) => {
+app.get("/submitAssessment", (req, res) => { 
   if (req.isAuthenticated() && req.user.role === "Teacher"){
 
     res.render("submitAssessment", {
@@ -531,7 +579,7 @@ app.get("/assessment/:assid", function(req, res){
   } else {
     res.redirect("/login");
 }
-
+  
 });
 
 /********************
@@ -550,18 +598,18 @@ app.get("/editAssessment/:assid", (req, res) => {
       grades: grades,
       user: req.user
       });
-
+      
   });
 
 } else {
   res.redirect("/login");
 }
-
-
+  
+  
 });
 
 /**********************
-Submit a new assessment
+Submit a new assessment 
 ***********************/
 
 app.post("/submitAssessment", async (req, res) => {
@@ -572,7 +620,7 @@ app.post("/submitAssessment", async (req, res) => {
       name: req.body.assname,
       weight: req.body.weight,
       totalMarks: req.body.totalMarks
-    });
+    }); 
     try {
       await assessment.save();
     } catch(error){
@@ -664,7 +712,7 @@ app.post("/addstudents", async (req, res) => {
   let usersToAdd = req.body.usersToAdd.split(' ');
 
   try{
-    for (let index=0; index<usersToAdd.length; index++){
+    for (let index=0; index<usersToAdd.length; index++){  
 
       // If the username does not already exist in the Student model
       // create and save a new student document using the username
@@ -685,7 +733,7 @@ app.post("/addstudents", async (req, res) => {
         name: user.name,
         studentID: newSID
         });
-        await newStudent.save();
+        await newStudent.save();    
 
         // Add a new grade document for each assessment for the new student
         let assessments = await Assessment.find({});
@@ -734,7 +782,7 @@ app.post("/removestudents", async (req, res) => {
 
         // delete any grade docuemnt with the deletedStudent
         await Grade.deleteMany({student: deletedStudent});
-      }
+      }   
 
     }
 
@@ -767,8 +815,8 @@ app.get("/login", (req, res) => {
 
 app.get('/logout', function(req, res, next) {
   req.logout(function(err) {
-    if (err) {
-      return next(err);
+    if (err) { 
+      return next(err); 
       }
     res.redirect('/');
   });
@@ -810,7 +858,7 @@ app.post("/register", async (req, res) => {
       //Set user role to Basic if it's not a teacher registeratoin
       await newuser.updateOne({role: "Basic"});
     }
-
+    
     // Authenticate user (set a cookie) and render the homepage
     passport.authenticate("local")(req, res, () => {
       res.redirect("/");
@@ -820,7 +868,7 @@ app.post("/register", async (req, res) => {
     console.log(err);
     res.redirect("/register");
   }
-
+  
 });
 
 

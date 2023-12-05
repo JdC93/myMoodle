@@ -1,5 +1,12 @@
-<%- include("partials/header"); -%> <% if (user.role == "Teacher") { %>
+<%- include("partials/header"); -%> 
 
+<div class="mainColumn">
+
+  <h1 style="text-align: center;">Professors</h1>
+
+<% if (user.role == "Teacher") { %>
+
+  
 <form action="/editProfessor/<%=thisprof._id%>" method="post">
   <div class="container2">
     <label class="">Your Title</label>
@@ -24,17 +31,23 @@
   </div>
 </form>
 
+
+
 <% } else if (user.role == "Student") { %>
 
-<h1 style="text-align: center">Professors</h1>
 
-<% for (let professor of professors) { %>
 
-<div class="container3">
-  <h3><%= professor.fullname %></h3>
-  <h2><%= professor.tile %></h2>
-  <p style="font-size: 14px"><%= professor.description %></p>
-  <br />
-</div>
+  <% for (let professor of professors) { %>
 
-<% } %> <% } %> <%- include("partials/footer"); -%>
+  <div id="posts">
+    <h3><%= professor.fullname %></h3>
+    <h2><%= professor.tile %></h2>
+    <p style="font-size: 14px"><%= professor.description %></p>
+    <br />
+  </div>
+
+  
+  <% } %>
+
+<% } %> 
+<%- include("partials/footer"); -%>

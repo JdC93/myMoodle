@@ -1,5 +1,5 @@
 function getallgrades() {
-    console.log("Hello?");
+    //console.log("Hello?");
     
     // Retrieve all form dom objects.
     // Every element except the first three and the last two are grades.

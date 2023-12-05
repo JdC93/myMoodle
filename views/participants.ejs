@@ -1,0 +1,26 @@
+<%- include("partials/header"); -%> 
+
+
+
+  <h1 style="text-align: center;">Participants</h1>
+
+  <table class="participantsTable">
+
+    <tr>
+        <th>Profile</th>
+        <th>Name</th>
+        <th>Chat</th>
+    </tr>
+
+    <% for (let student of enrolledStudents) { %>
+    <tr>
+        <td><img src="/profile.png" style="width: 20px; height: 20px; object-fit: contain;"></td>
+        <td><%= student.name %></td>
+        <td><u>Chat</u></td>
+    </tr>
+    <% } %>
+
+</table>
+
+
+<%- include("partials/footer"); -%>

@@ -1,0 +1,50 @@
+<%- include('partials/header'); -%>
+
+<div class="mainColumn">
+
+    <div id="posts">
+        <h1>Welcome To SOEN357</h1>
+        <p>this is an introduction course on interface design</p>
+    </div>
+    <% posts.forEach(function(post) { %>
+        <div id="posts">
+            <h1><%= post.title %></h1>
+            <p><%= post.content %></p>
+        </div>
+    <%}) %>
+
+</div>
+
+<div class="notifIcon"><button id="button" onclick="notifButton()"><img src="/notification2.png"></button></div>
+
+<div id="announcements" class="announcements">
+
+    <h2 style="order: 1">Announcements</h2>
+    <p><a href="/announcements">Review all the announcement</a></p>
+
+    
+    <% if (user.role == "Teacher") { %>
+    <div id="announcebox">
+        <h3>Compose a new announcement</h3>
+        <div>
+        <form action="/announce" method="post">
+              <input type="text" name="subject" value="Subject">
+              <br>
+              <textarea  name="content" >Announcement</textarea> <br>
+            <button type="submit" name="button">Publish</button>
+          </form>
+        </div>
+    </div>
+    <% } %>
+
+    <% for (let announcement of announcements) { %>
+        <div id="announcebox">
+            <h3><%= announcement.title %></h3>
+            <p id="annoucecontent"><%= announcement.content %></p>
+        </div>
+    <% } %>
+
+</div>
+
+
+<%- include('partials/footer'); -%>
